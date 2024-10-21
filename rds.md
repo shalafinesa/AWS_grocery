@@ -15,7 +15,25 @@ This tutorial will guide you through the process of migrating your SQLite3 datab
 
 ---
 
-### Step 1: Export SQLite3 Database
+
+
+### Step 1: Update Flask Configuration
+
+Update your Flask configuration to point to PostgreSQL. In your `.env` file, update the `SQLALCHEMY_DATABASE_URI` to use the PostgreSQL RDS connection string.
+
+You can test it first locally and then implement it in your EC2 instance, remember to restart the app in the EC2 machine to see the changes
+You can use Pgadmin4 to visualize the data of your RDS to test if is connected properly
+
+Example:
+
+FLASK_ENV=environment
+POSTGRES_URI=`postgresql://<username>:<password>@<rds-endpoint>:<rds-port>/<rds-database>`
+
+Replace `<username>` and `<password>`, `<rds-endpoint>`, `<rds-port>` and `<rds-database>` with your actual credentials.
+
+---
+
+### Step 2: Export SQLite3 Database
 
 To export your SQLite3 database, run the following command in the `/app` directory:
 
@@ -27,7 +45,7 @@ This will create a SQL dump of your SQLite3 database.
 
 ---
 
-### Step 2: Modify the Dump File
+### Step 3: Modify the Dump File
 
 You’ll need to adjust the dump file to ensure compatibility with PostgreSQL. Here’s what to modify:
 
@@ -52,7 +70,7 @@ You’ll need to adjust the dump file to ensure compatibility with PostgreSQL. H
 
 ---
 
-### Step 3: Initialize Flask with PostgreSQL
+### Step 4: Initialize Flask with PostgreSQL
 
 Ensure your Flask application’s migrations are in sync with the PostgreSQL database schema. Run the following commands:
 ```bash
@@ -66,7 +84,7 @@ If you have some issues with the transition from sqlite to PostgreSQL, you can u
 
 ---
 
-### Step 4: Connect to PostgreSQL RDS
+### Step 5: Connect to PostgreSQL RDS
 
 Once you’ve made the necessary changes, connect to your PostgreSQL RDS instance. Use a command like this:
 
@@ -79,7 +97,7 @@ Replace the host, username, and database name with your own values.
 
 ---
 
-### Step 5: Load Data into PostgreSQL
+### Step 6: Load Data into PostgreSQL
 
 To load the modified SQLite dump into PostgreSQL, run this command from within `psql`:
 
@@ -87,18 +105,3 @@ To load the modified SQLite dump into PostgreSQL, run this command from within `
 
 This will execute the dump file and populate your PostgreSQL database with the data from SQLite.
 
----
-
-### Step 6: Update Flask Configuration
-
-Update your Flask configuration to point to PostgreSQL. In your `.env` file, update the `SQLALCHEMY_DATABASE_URI` to use the PostgreSQL RDS connection string.
-
-You can test it first locally and then implement it in your EC2 instance, remember to restart the app in the EC2 machine to see the changes
-You can use Pgadmin4 to visualize the data of your RDS to test if is connected properly
-
-Example:
-
-FLASK_ENV=environment
-POSTGRES_URI=postgresql://<username>:<password>@<rds-endpoint>:<rds-port>/<rds-database>
-
-Replace `<username>` and `<password>`, `<rds-endpoint>`, `<rds-port>` and `<rds-database>` with your actual credentials.
