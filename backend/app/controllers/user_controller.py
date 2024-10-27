@@ -4,7 +4,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from ..models.user_model import User
 from ..services.user_service import add_to_favorites, get_user_favorites, remove_from_favorites, sync_basket_service, \
     get_user_basket, remove_from_basket_service, add_product_to_purchased, get_user_purchased_products, get_user_info, \
-    clear_user_basket, save_avatar, UPLOAD_FOLDER, get_all_users
+    clear_user_basket, save_avatar, UPLOAD_FOLDER, get_all_users, get_avatar_url
 
 
 @jwt_required()
@@ -234,7 +234,5 @@ def serve_avatar(filename):
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
 
-    if user and user.avatar and user.avatar.startswith("https://"):
-        return jsonify({"avatar": user.avatar}), 200
-
-    return send_from_directory(UPLOAD_FOLDER, 'user_default.png')
+    avatar_url = get_avatar_url(user)
+    return jsonify({"avatar": avatar_url}), 200

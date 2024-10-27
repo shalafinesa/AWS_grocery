@@ -63,13 +63,19 @@ const useUserInfo = () => {
     fetchAllUsers();
   }, []);
 
-  const getAvatarUrl = (author) => {
-    const user = users.find((user) => user.username === author);
-    return user
-      ? `${process.env.REACT_APP_BACKEND_SERVER}/api/me/avatar/${user.avatar}`
-      : `${process.env.REACT_APP_BACKEND_SERVER}/api/me/avatar/user_default.png`;
+  const getAvatarUrl = (username) => {
+    const user = users.find((user) => user.username === username);
+  
+    if (user && user.avatar && user.avatar.startsWith('https://')) {
+      return user.avatar;
+    }
+  
+    if (process.env.REACT_APP_USE_S3_STORAGE === 'true') {
+      return `https://${process.env.REACT_APP_S3_BUCKET}.s3.${process.env.REACT_APP_S3_REGION}.amazonaws.com/avatars/user_default.png`;
+    } else {
+      return `${process.env.REACT_APP_BACKEND_SERVER}/api/me/avatar/user_default.png`;
+    }
   };
-
   return {
     username,
     avatarUrl,
