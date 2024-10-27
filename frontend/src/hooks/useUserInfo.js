@@ -17,7 +17,7 @@ const useUserInfo = () => {
       if (response.ok) {
         const data = await response.json();
         setUsername(data.username);
-        setAvatarUrl(`${process.env.REACT_APP_BACKEND_SERVER}/api/me/avatar/${data.avatar || 'user_default.png'}`);
+        setAvatarUrl(data.avatar);
       } else {
         console.error('Failed to fetch user info');
       }
@@ -47,7 +47,7 @@ const useUserInfo = () => {
   };
 
   const updateAvatarInState = (newAvatar) => {
-    const newAvatarUrl = `${process.env.REACT_APP_BACKEND_SERVER}/api/me/avatar/${newAvatar}`;
+    const newAvatarUrl = newAvatar;
     setAvatarUrl(newAvatarUrl);
     
     // Update the users list locally to reflect the new avatar for the current user

@@ -11,7 +11,7 @@ const AvatarModal = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
-      fetchUserInfo(); // Fetch user info when the modal opens
+      fetchUserInfo();
     }
   }, [isOpen, fetchUserInfo]);
 
@@ -41,9 +41,9 @@ const AvatarModal = ({ isOpen, onClose }) => {
 
         if (response.ok) {
           setSuccessMessage('Avatar uploaded successfully');
-          setPreview(null); // Clear preview after upload
-          setFile(null); // Clear file after upload
-          fetchUserInfo(); // Refetch user info to get the updated avatar
+          setPreview(null);
+          setFile(null);
+          fetchUserInfo();
         } else {
           setErrorMessage(result.error || 'Failed to upload avatar');
         }
