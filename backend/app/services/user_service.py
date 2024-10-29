@@ -1,6 +1,7 @@
 import os
 
 import boto3
+import requests
 from botocore.exceptions import NoCredentialsError
 from flask import current_app
 from werkzeug.utils import secure_filename
@@ -20,14 +21,31 @@ DEFAULT_AVATAR_S3_URL = f"https://{S3_BUCKET}.s3.{S3_REGION}.amazonaws.com/avata
 DEFAULT_AVATAR_LOCAL_PATH = os.path.join(UPLOAD_FOLDER, DEFAULT_AVATAR)
 
 
-if USE_S3_STORAGE:
-    s3_client = boto3.client(
-        's3',
-        region_name=S3_REGION,
-        aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-        aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
-        aws_session_token=os.getenv('AWS_SESSION_TOKEN')
-    )
+def is_ec2_instance():
+    """Detects if the script is running on an EC2 instance by checking instance metadata."""
+    try:
+        response = requests.get("http://169.254.169.254/latest/meta-data/", timeout=0.1)
+        return response.status_code == 200
+    except requests.RequestException:
+        return False
+
+
+def get_s3_client():
+    if USE_S3_STORAGE:
+        if is_ec2_instance():
+            session = boto3.Session()
+            return session.client('s3', region_name=S3_REGION)
+        return boto3.client(
+                's3',
+                region_name=S3_REGION,
+                aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+                aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+                aws_session_token=os.getenv('AWS_SESSION_TOKEN')
+            )
+    return None
+
+
+s3_client = get_s3_client()
 
 
 def get_avatar_url(user):
