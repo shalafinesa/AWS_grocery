@@ -1,15 +1,18 @@
-# Use a lightweight base image with Nginx
-FROM nginx:alpine
+# Stage 1: Build the React app
+FROM node:18-alpine AS builder
 
-# Copy Nginx configuration file
-COPY frontend/nginx.conf /etc/nginx/nginx.conf
+# Set the working directory
+WORKDIR /app
 
-# Copy the pre-built React app into the Nginx directory
-COPY frontend/build/ /usr/share/nginx/html/
+# Copy package.json and package-lock.json to install dependencies
+COPY frontend/package.json frontend/package-lock.json ./
 
-# Expose port 80
-EXPOSE 80
-EXPOSE 443
+# Install dependencies
+RUN npm install
 
-# Command to run Nginx in the foreground
-CMD ["nginx", "-g", "daemon off;"]
+# Copy the rest of the frontend code and build it
+COPY frontend/ ./
+RUN npm run build  # This will create the build files in /app/build
+
+# Create a marker file indicating the build is complete
+RUN touch /app/build/BUILD_COMPLETE

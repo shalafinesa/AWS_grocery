@@ -1,4 +1,16 @@
 services:
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: frontend
+    networks:
+      - app-network
+    volumes:
+      - frontend-build:/app/build
+    command: >
+      sh -c "npm run build && touch /app/build/BUILD_COMPLETE"
+
   backend:
     build:
       context: .
@@ -10,27 +22,17 @@ services:
       - backend/.env
     networks:
       - app-network
-
-  frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
-    container_name: frontend
-    ports:
-      - "80:80"
-      - "443:443"
     volumes:
-      - ./frontend/certs:/etc/letsencrypt/live/grocerymate.masterschool.com:ro
-    networks:
-      - app-network
+      - frontend-build:/app/../frontend/build:ro
+    depends_on:
+      - frontend
+    command: >
+      sh -c 'while [ ! -f /app/../frontend/build/BUILD_COMPLETE ]; do
+      echo "Waiting for frontend build..."; sleep 5; done &&
+      gunicorn --bind 0.0.0.0:5000 run:app'
 
-  mongo:
-    image: mongo:latest
-    container_name: mongo
-    ports:
-      - "27017:27017"
-    networks:
-      - app-network
+volumes:
+  frontend-build: {}
 
 networks:
   app-network:
