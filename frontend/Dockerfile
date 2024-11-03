@@ -11,8 +11,7 @@ COPY frontend/package.json frontend/package-lock.json ./
 RUN npm install
 
 # Copy the rest of the frontend code and build it
-COPY frontend/ ./
-RUN npm run build  # This will create the build files in /app/build
+COPY frontend/build /app/build
 
 # Create a marker file indicating the build is complete
 RUN touch /app/build/BUILD_COMPLETE

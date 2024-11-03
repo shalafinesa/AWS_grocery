@@ -9,7 +9,7 @@ services:
     volumes:
       - frontend-build:/app/build
     command: >
-      sh -c "npm run build && touch /app/build/BUILD_COMPLETE"
+      sh -c "touch /app/build/BUILD_COMPLETE"
 
   backend:
     build:
