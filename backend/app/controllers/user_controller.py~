@@ -237,8 +237,8 @@ def serve_avatar(filename):
 
     if os.path.exists(local_avatar_path):
         return send_from_directory(UPLOAD_FOLDER, filename)
-
-    default_avatar_path = os.path.join(UPLOAD_FOLDER, "user_default.png")
-    if os.path.exists(default_avatar_path):
-        return send_from_directory(UPLOAD_FOLDER, "user_default.png")
-    return jsonify({"error": "Avatar not found"}), 404
+    else:
+        default_avatar_path = os.path.join(UPLOAD_FOLDER, "user_default.png")
+        if os.path.exists(default_avatar_path):
+            return send_from_directory(UPLOAD_FOLDER, "user_default.png")
+        return jsonify({"error": "Avatar not found"}), 404

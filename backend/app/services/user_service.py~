@@ -58,14 +58,16 @@ def get_avatar_url(user):
             return user.avatar
         return DEFAULT_AVATAR_S3_URL
     else:
-        # Use local storage path
         if user.avatar:
             local_avatar_path = os.path.join(UPLOAD_FOLDER, user.avatar)
+            print("local_avatar_path:", local_avatar_path)
             if os.path.exists(local_avatar_path):
-                # Serve avatar from local server
-                return f"/api/me/avatar/{user.avatar}"
-        # Fallback to the default avatar
-        return f"/api/me/avatar/{DEFAULT_AVATAR}"
+                avatar_url = f"/avatar/{user.avatar}"
+                print("Resolved avatar URL:", avatar_url)
+                return avatar_url
+        fallback_url = f"/avatar/{DEFAULT_AVATAR}"
+        print("Fallback URL:", fallback_url)
+        return fallback_url
 
 
 def get_all_users() -> list:
