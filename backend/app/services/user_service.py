@@ -1,11 +1,10 @@
 import os
-
+from typing import List, Dict
 import boto3
 import requests
 from botocore.exceptions import NoCredentialsError
 from flask import current_app
 from werkzeug.utils import secure_filename
-from typing import List, Dict
 from .. import db
 from ..models.user_model import User, BasketItem
 from ..models.product_model import Product
@@ -31,6 +30,9 @@ def is_ec2_instance():
 
 
 def get_s3_client():
+    """
+    Returns an S3 client based on the storage option.
+    """
     if USE_S3_STORAGE:
         if is_ec2_instance():
             session = boto3.Session()
@@ -58,10 +60,11 @@ def get_avatar_url(user):
             return user.avatar
         return DEFAULT_AVATAR_S3_URL
     else:
-        local_avatar_path = os.path.join(UPLOAD_FOLDER, user.avatar) if user.avatar else None
-        if user.avatar and os.path.exists(local_avatar_path):
-            return local_avatar_path
-        return DEFAULT_AVATAR_LOCAL_PATH
+        if user.avatar:
+            local_avatar_path = os.path.join(UPLOAD_FOLDER, user.avatar)
+            if os.path.exists(local_avatar_path):
+                return f"/api/me/avatar/{user.avatar}"
+        return f"/api/me/avatar/{DEFAULT_AVATAR}"
 
 
 def get_all_users() -> list:
@@ -84,6 +87,7 @@ def get_all_users() -> list:
 
     current_app.logger.info(f"Retrieved {len(users)} users.")
     return user_list
+
 
 def get_user_info(user_id: int) -> dict:
     """
@@ -111,6 +115,16 @@ def get_user_info(user_id: int) -> dict:
 
 
 def add_to_favorites(user_id: int, product_id: int) -> dict:
+    """
+    Adds a product to the user's list of favorite products in the database.
+
+    Args:
+        user_id (int): The ID of the user.
+        product_id (int): The ID of the product to add.
+
+    Returns:
+        dict: The raw result of the update operation.
+    """
     user = User.query.get(user_id)
     if not user:
         current_app.logger.error(f"User with ID {user_id} not found.")

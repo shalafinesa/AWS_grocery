@@ -1,3 +1,5 @@
+import os
+
 from flask import jsonify, request, current_app, send_from_directory, redirect
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
@@ -229,10 +231,14 @@ def upload_avatar():
 
 def serve_avatar(filename):
     """
-    Serve the avatar image from the avatar folder.
+    Serve the avatar image from the local avatar folder.
     """
-    user_id = get_jwt_identity()
-    user = User.query.get(user_id)
+    local_avatar_path = os.path.join(UPLOAD_FOLDER, filename)
 
-    avatar_url = get_avatar_url(user)
-    return jsonify({"avatar": avatar_url}), 200
+    if os.path.exists(local_avatar_path):
+        return send_from_directory(UPLOAD_FOLDER, filename)
+
+    default_avatar_path = os.path.join(UPLOAD_FOLDER, "user_default.png")
+    if os.path.exists(default_avatar_path):
+        return send_from_directory(UPLOAD_FOLDER, "user_default.png")
+    return jsonify({"error": "Avatar not found"}), 404
