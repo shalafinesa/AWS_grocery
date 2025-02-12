@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config';
 
 const useUserInfo = () => {
   const [username, setUsername] = useState('');
@@ -7,7 +8,7 @@ const useUserInfo = () => {
 
   const fetchUserInfo = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_SERVER}/api/me/info`, {
+      const response = await fetch(`${API_BASE_URL}/api/me/info`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -28,7 +29,7 @@ const useUserInfo = () => {
 
   const fetchAllUsers = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_SERVER}/api/me/all-users`, {
+      const response = await fetch(`${API_BASE_URL}/api/me/all-users`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -73,7 +74,7 @@ const useUserInfo = () => {
     if (process.env.REACT_APP_USE_S3_STORAGE === 'true') {
       return `https://${process.env.REACT_APP_S3_BUCKET}.s3.${process.env.REACT_APP_S3_REGION}.amazonaws.com/avatars/user_default.png`;
     } else {
-      return `${process.env.REACT_APP_BACKEND_SERVER}/api/me/avatar/user_default.png`;
+      return `${API_BASE_URL}/api/me/avatar/user_default.png`;
     }
   };
   return {

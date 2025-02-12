@@ -1,7 +1,7 @@
 import logging
 from logging.handlers import RotatingFileHandler
 import os
-from flask import Flask, send_from_directory, render_template
+from flask import Flask, send_from_directory, render_template, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
@@ -13,11 +13,11 @@ from datetime import timedelta
 load_dotenv()
 db = SQLAlchemy()
 
+
 class Config:
     """App configuration variables."""
     if os.getenv("FLASK_ENV") == "development":
         SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(os.path.abspath(os.path.dirname(__file__)), "local.db")
-
     else:
         POSTGRES_URI = os.getenv("POSTGRES_URI")
         SQLALCHEMY_DATABASE_URI = POSTGRES_URI
@@ -29,15 +29,6 @@ class Config:
 
 
 def create_app():
-    """
-    Creates and configures the Flask application.
-
-    This function initializes the Flask app with necessary configurations, including
-    enabling CORS, setting up JWT authentication, and registering blueprints for routes.
-
-    Returns:
-        Flask: The configured Flask application.
-    """
     app = Flask(__name__,
                 static_folder="../../frontend/build/static",
                 template_folder=os.path.join(os.path.dirname(__file__), "../../frontend/build"))
@@ -64,13 +55,38 @@ def create_app():
     app.register_blueprint(product_bp)
     app.register_blueprint(health_bp)
 
+    def inject_backend_url():
+        """Get the backend URL based on the current request"""
+        if os.getenv("FLASK_ENV") != "development":
+            # For EC2, get the public IP using the EC2 metadata service
+            import requests
+            try:
+                public_ip = requests.get('http://169.254.169.254/latest/meta-data/public-ipv4', timeout=1).text
+                return f"http://{public_ip}:5000"
+            except:
+                # Fallback to request host if metadata service fails
+                return f"http://{request.host}"
+        else:
+            # Development environment
+            if request.headers.get('X-Forwarded-Proto'):
+                proto = request.headers.get('X-Forwarded-Proto')
+                host = request.headers.get('X-Forwarded-Host', request.host)
+            else:
+                proto = request.scheme
+                host = request.host
+            return f"{proto}://{host}"
+
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
     def serve_react_app(path):
         if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
             return send_from_directory(app.static_folder, path)
         else:
-            return render_template("index.html")
+            backend_url = inject_backend_url()
+            return render_template(
+                "index.html",
+                backend_url=backend_url
+            )
 
     return app
 
