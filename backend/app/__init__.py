@@ -9,10 +9,12 @@ from sqlalchemy import text
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 from datetime import timedelta
+import requests
 
 load_dotenv()
 db = SQLAlchemy()
 
+DEPLOYMENT_ENV = os.getenv("DEPLOYMENT_ENV", "local")
 
 class Config:
     """App configuration variables."""
@@ -57,17 +59,15 @@ def create_app():
 
     def inject_backend_url():
         """Get the backend URL based on the current request"""
-        if os.getenv("FLASK_ENV") != "development":
-            # For EC2, get the public IP using the EC2 metadata service
-            import requests
+        if DEPLOYMENT_ENV == "public_ip":
             try:
                 public_ip = requests.get('http://169.254.169.254/latest/meta-data/public-ipv4', timeout=1).text
                 return f"http://{public_ip}:5000"
-            except:
-                # Fallback to request host if metadata service fails
+            except requests.exceptions.RequestException:
                 return f"http://{request.host}"
-        else:
-            # Development environment
+
+        elif DEPLOYMENT_ENV == "load_balancer":
+            # Running behind a Load Balancer
             if request.headers.get('X-Forwarded-Proto'):
                 proto = request.headers.get('X-Forwarded-Proto')
                 host = request.headers.get('X-Forwarded-Host', request.host)
@@ -75,6 +75,10 @@ def create_app():
                 proto = request.scheme
                 host = request.host
             return f"{proto}://{host}"
+
+        else:
+            # Default: Local development
+            return f"{request.scheme}://{request.host}"
 
     @app.route("/", defaults={"path": ""})
     @app.route("/<path:path>")
