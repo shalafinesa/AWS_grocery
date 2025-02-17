@@ -1,4 +1,6 @@
 import logging
+import shutil
+import zipfile
 from logging.handlers import RotatingFileHandler
 import os
 from flask import Flask, send_from_directory, render_template, request
@@ -10,11 +12,19 @@ from flask_migrate import Migrate
 from dotenv import load_dotenv
 from datetime import timedelta
 import requests
+from dateutil import parser
 
 load_dotenv()
 db = SQLAlchemy()
 
 DEPLOYMENT_ENV = os.getenv("DEPLOYMENT_ENV", "local")
+GITHUB_USERNAME = "AlejandroRomanIbanez"
+REPO_NAME = "AWS_grocery"
+FRONTEND_BUILD_ZIP = "frontend-build.zip"
+FRONTEND_BUILD_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../frontend/build"))
+TMP_ZIP_PATH = "/tmp/frontend-build.zip"
+GITHUB_RELEASE_URL = f"https://github.com/{GITHUB_USERNAME}/{REPO_NAME}/releases/latest/download/{FRONTEND_BUILD_ZIP}"
+
 
 class Config:
     """App configuration variables."""
@@ -30,7 +40,81 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=4)
 
 
+def fetch_frontend():
+    """
+    Fetches the latest frontend build from GitHub Releases if it's missing or outdated.
+    """
+    if os.path.exists(FRONTEND_BUILD_PATH):
+        print("Frontend build is already present. Checking for updates...")
+
+        # Fetch the latest release's timestamp
+        latest_release_timestamp = get_github_release_timestamp()
+        local_build_timestamp = get_local_build_timestamp()
+
+        if latest_release_timestamp and local_build_timestamp:
+            if local_build_timestamp >= latest_release_timestamp:
+                print("Frontend build is up to date.")
+                return
+            print("Frontend build is outdated. Fetching the latest version...")
+
+    else:
+        print("Frontend build not found. Fetching the latest version...")
+
+    try:
+        # Download the latest frontend build
+        response = requests.get(GITHUB_RELEASE_URL, stream=True)
+        if response.status_code == 200:
+            with open(TMP_ZIP_PATH, "wb") as f:
+                f.write(response.content)
+
+            # Remove old build if exists
+            if os.path.exists(FRONTEND_BUILD_PATH):
+                shutil.rmtree(FRONTEND_BUILD_PATH)
+                print("Old frontend build removed.")
+
+            # Extract latest frontend build
+            with zipfile.ZipFile(TMP_ZIP_PATH, 'r') as zip_ref:
+                zip_ref.extractall(os.path.dirname(FRONTEND_BUILD_PATH))
+
+            print("Frontend build downloaded and extracted successfully.")
+        else:
+            print("Failed to download frontend build. Status Code:", response.status_code)
+    except Exception as e:
+        print(f"⚠️ Error fetching frontend: {e}")
+
+
+def get_github_release_timestamp():
+    """
+    Fetches the timestamp of the latest frontend release from GitHub.
+    """
+    release_api_url = f"https://api.github.com/repos/{GITHUB_USERNAME}/{REPO_NAME}/releases/latest"
+    try:
+        response = requests.get(release_api_url)
+        if response.status_code == 200:
+            timestamp_iso = response.json().get("published_at")
+            if timestamp_iso:
+                return int(parser.parse(timestamp_iso).timestamp())
+    except Exception as e:
+        print(f"⚠️ Error fetching GitHub release timestamp: {e}")
+    return None
+
+
+def get_local_build_timestamp():
+    """
+    Retrieves the timestamp of the local frontend build.
+    """
+    try:
+        return os.path.getmtime(FRONTEND_BUILD_PATH)
+    except Exception:
+        return None
+
+
 def create_app():
+    """
+    Creates and configures the Flask app.
+    """
+    fetch_frontend()
+
     app = Flask(__name__,
                 static_folder="../../frontend/build/static",
                 template_folder=os.path.join(os.path.dirname(__file__), "../../frontend/build"))
