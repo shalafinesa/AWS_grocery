@@ -72,9 +72,16 @@ def fetch_frontend():
                 shutil.rmtree(FRONTEND_BUILD_PATH)
                 print("Old frontend build removed.")
 
-            # Extract latest frontend build
+            temp_extract_path = os.path.dirname(FRONTEND_BUILD_PATH)
             with zipfile.ZipFile(TMP_ZIP_PATH, 'r') as zip_ref:
-                zip_ref.extractall(os.path.dirname(FRONTEND_BUILD_PATH))
+                zip_ref.extractall(temp_extract_path)
+
+            # Ensure the extracted folder is renamed correctly
+            extracted_build_path = os.path.join(temp_extract_path, "build")
+            if os.path.exists(extracted_build_path):
+                shutil.move(extracted_build_path, FRONTEND_BUILD_PATH)
+            else:
+                print("Extracted folder is missing `build/` directory. Check your release ZIP structure!")
 
             print("Frontend build downloaded and extracted successfully.")
         else:
