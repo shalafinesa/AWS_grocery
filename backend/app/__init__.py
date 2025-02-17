@@ -42,11 +42,10 @@ class Config:
 
 def fetch_frontend():
     """
-    Fetches the latest frontend build from GitHub Releases if it's missing or outdated.
+    Fetches the latest frontend build from GitHub Releases and ensures it's placed in frontend/build.
     """
     if os.path.exists(FRONTEND_BUILD_PATH):
         print("Frontend build is already present. Checking for updates...")
-
         latest_release_timestamp = get_github_release_timestamp()
         local_build_timestamp = get_local_build_timestamp()
 
@@ -55,46 +54,79 @@ def fetch_frontend():
                 print("Frontend build is up to date.")
                 return
             print("Frontend build is outdated. Fetching the latest version...")
-
     else:
         print("Frontend build not found. Fetching the latest version...")
 
     try:
         response = requests.get(GITHUB_RELEASE_URL, stream=True)
         if response.status_code == 200:
+            # Save the zip file
             with open(TMP_ZIP_PATH, "wb") as f:
                 f.write(response.content)
 
-            if os.path.exists(FRONTEND_BUILD_PATH):
-                shutil.rmtree(FRONTEND_BUILD_PATH)
-                print("Old frontend build removed.")
+            # Ensure frontend directory exists
+            frontend_dir = os.path.dirname(FRONTEND_BUILD_PATH)
+            os.makedirs(frontend_dir, exist_ok=True)
 
-            os.makedirs(FRONTEND_BUILD_PATH, exist_ok=True)
+            # Create temporary extraction directory
+            temp_extract_path = os.path.join(frontend_dir, "temp_extract")
+            shutil.rmtree(temp_extract_path, ignore_errors=True)
+            os.makedirs(temp_extract_path)
 
+            # First, extract to temp directory
             with zipfile.ZipFile(TMP_ZIP_PATH, 'r') as zip_ref:
-                temp_extract_path = os.path.join(os.path.dirname(FRONTEND_BUILD_PATH), "frontend_temp")
-                shutil.rmtree(temp_extract_path, ignore_errors=True)
-                os.makedirs(temp_extract_path, exist_ok=True)
-
                 zip_ref.extractall(temp_extract_path)
 
-                extracted_files = os.listdir(temp_extract_path)
-                if "build" in extracted_files:
-                    extracted_build_path = os.path.join(temp_extract_path, "build")
+            # Clear existing build directory if it exists
+            if os.path.exists(FRONTEND_BUILD_PATH):
+                shutil.rmtree(FRONTEND_BUILD_PATH)
+
+            # Create fresh build directory
+            os.makedirs(FRONTEND_BUILD_PATH)
+
+            # Determine source of files
+            if os.path.exists(os.path.join(temp_extract_path, "build", "index.html")):
+                # Files are in a build subdirectory
+                source_dir = os.path.join(temp_extract_path, "build")
+                print("Found build directory in zip, using its contents")
+            elif os.path.exists(os.path.join(temp_extract_path, "index.html")):
+                # Files are at root
+                source_dir = temp_extract_path
+                print("Found files at root of zip, moving them to build directory")
+            else:
+                raise Exception("Could not find index.html in the extracted content")
+
+            # Copy everything to build directory
+            for item in os.listdir(source_dir):
+                source = os.path.join(source_dir, item)
+                dest = os.path.join(FRONTEND_BUILD_PATH, item)
+                if os.path.isdir(source):
+                    shutil.copytree(source, dest)
                 else:
-                    extracted_build_path = temp_extract_path
+                    shutil.copy2(source, dest)
 
-                # Move extracted files into the actual build directory
-                for item in os.listdir(extracted_build_path):
-                    shutil.move(os.path.join(extracted_build_path, item), FRONTEND_BUILD_PATH)
+            print("Frontend files successfully moved to build directory")
 
-                shutil.rmtree(temp_extract_path)
+            # Verify the build directory has expected files
+            if not os.path.exists(os.path.join(FRONTEND_BUILD_PATH, "index.html")):
+                raise Exception("Failed to find index.html in final build directory")
 
-            print("Frontend build downloaded and extracted successfully.")
+            # Clean up
+            shutil.rmtree(temp_extract_path, ignore_errors=True)
+            os.remove(TMP_ZIP_PATH)
+
+            print("Frontend build downloaded and extracted successfully")
         else:
-            print("Failed to download frontend build. Status Code:", response.status_code)
+            print(f"Failed to download frontend build. Status Code: {response.status_code}")
     except Exception as e:
         print(f"Error fetching frontend: {e}")
+        # Clean up on error
+        if 'temp_extract_path' in locals():
+            shutil.rmtree(temp_extract_path, ignore_errors=True)
+        if os.path.exists(TMP_ZIP_PATH):
+            os.remove(TMP_ZIP_PATH)
+        # Keep existing build if update fails
+        raise
 
 
 def get_github_release_timestamp():
