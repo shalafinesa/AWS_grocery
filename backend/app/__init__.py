@@ -47,7 +47,6 @@ def fetch_frontend():
     if os.path.exists(FRONTEND_BUILD_PATH):
         print("Frontend build is already present. Checking for updates...")
 
-        # Fetch the latest release's timestamp
         latest_release_timestamp = get_github_release_timestamp()
         local_build_timestamp = get_local_build_timestamp()
 
@@ -61,33 +60,41 @@ def fetch_frontend():
         print("Frontend build not found. Fetching the latest version...")
 
     try:
-        # Download the latest frontend build
         response = requests.get(GITHUB_RELEASE_URL, stream=True)
         if response.status_code == 200:
             with open(TMP_ZIP_PATH, "wb") as f:
                 f.write(response.content)
 
-            # Remove old build if exists
             if os.path.exists(FRONTEND_BUILD_PATH):
                 shutil.rmtree(FRONTEND_BUILD_PATH)
                 print("Old frontend build removed.")
 
-            temp_extract_path = os.path.dirname(FRONTEND_BUILD_PATH)
+            os.makedirs(FRONTEND_BUILD_PATH, exist_ok=True)
+
             with zipfile.ZipFile(TMP_ZIP_PATH, 'r') as zip_ref:
+                temp_extract_path = os.path.join(os.path.dirname(FRONTEND_BUILD_PATH), "frontend_temp")
+                shutil.rmtree(temp_extract_path, ignore_errors=True)
+                os.makedirs(temp_extract_path, exist_ok=True)
+
                 zip_ref.extractall(temp_extract_path)
 
-            # Ensure the extracted folder is renamed correctly
-            extracted_build_path = os.path.join(temp_extract_path, "build")
-            if os.path.exists(extracted_build_path):
-                shutil.move(extracted_build_path, FRONTEND_BUILD_PATH)
-            else:
-                print("Extracted folder is missing `build/` directory. Check your release ZIP structure!")
+                extracted_files = os.listdir(temp_extract_path)
+                if "build" in extracted_files:
+                    extracted_build_path = os.path.join(temp_extract_path, "build")
+                else:
+                    extracted_build_path = temp_extract_path
+
+                # Move extracted files into the actual build directory
+                for item in os.listdir(extracted_build_path):
+                    shutil.move(os.path.join(extracted_build_path, item), FRONTEND_BUILD_PATH)
+
+                shutil.rmtree(temp_extract_path)
 
             print("Frontend build downloaded and extracted successfully.")
         else:
             print("Failed to download frontend build. Status Code:", response.status_code)
     except Exception as e:
-        print(f"⚠️ Error fetching frontend: {e}")
+        print(f"Error fetching frontend: {e}")
 
 
 def get_github_release_timestamp():
@@ -102,7 +109,7 @@ def get_github_release_timestamp():
             if timestamp_iso:
                 return int(parser.parse(timestamp_iso).timestamp())
     except Exception as e:
-        print(f"⚠️ Error fetching GitHub release timestamp: {e}")
+        print(f"Error fetching GitHub release timestamp: {e}")
     return None
 
 
