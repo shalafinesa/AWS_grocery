@@ -1,5 +1,6 @@
 import logging
 import shutil
+import tempfile
 import zipfile
 from logging.handlers import RotatingFileHandler
 import os
@@ -22,7 +23,7 @@ GITHUB_USERNAME = "AlejandroRomanIbanez"
 REPO_NAME = "AWS_grocery"
 FRONTEND_BUILD_ZIP = "frontend-build.zip"
 FRONTEND_BUILD_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../frontend/build"))
-TMP_ZIP_PATH = "/tmp/frontend-build.zip"
+TMP_ZIP_PATH = os.path.join(tempfile.gettempdir(), "frontend-build.zip")
 GITHUB_RELEASE_URL = f"https://github.com/{GITHUB_USERNAME}/{REPO_NAME}/releases/latest/download/{FRONTEND_BUILD_ZIP}"
 
 
@@ -38,6 +39,34 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=4)
+
+
+def get_public_ip():
+    """Try multiple methods to get the public IP"""
+    # Method 1: AWS Instance Metadata
+    try:
+        response = requests.get('http://169.254.169.254/latest/meta-data/public-ipv4', timeout=1)
+        if response.status_code == 200:
+            return response.text.strip()
+    except requests.exceptions.RequestException:
+        pass
+
+    # Method 2: Public IP API services
+    ip_apis = [
+        'http://ipinfo.io/ip',
+        'https://api.ipify.org',
+        'http://ip-api.com/line/?fields=query'
+    ]
+
+    for api in ip_apis:
+        try:
+            response = requests.get(api, timeout=2)
+            if response.status_code == 200:
+                return response.text.strip()
+        except requests.exceptions.RequestException:
+            continue
+
+    return None
 
 
 def fetch_frontend():
@@ -192,11 +221,20 @@ def create_app():
     def inject_backend_url():
         """Get the backend URL based on the current request"""
         if DEPLOYMENT_ENV == "public_ip":
-            try:
-                public_ip = requests.get('http://169.254.169.254/latest/meta-data/public-ipv4', timeout=1).text
+            public_ip = get_public_ip()
+            if public_ip:
+                print(f"Using public IP: {public_ip}")
                 return f"http://{public_ip}:5000"
-            except requests.exceptions.RequestException:
-                return f"http://{request.host}"
+
+            # Fallback: Try to get from request host
+            if request.host:
+                host = request.host.split(':')[0]
+                print(f"Falling back to request host: {host}")
+                return f"http://{host}:5000"
+
+            # Final fallback: Use the raw request URL
+            print(f"Using request URL: {request.url_root}")
+            return request.url_root.rstrip('/')
 
         elif DEPLOYMENT_ENV == "load_balancer":
             # Running behind a Load Balancer
