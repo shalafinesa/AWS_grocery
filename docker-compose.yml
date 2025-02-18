@@ -1,16 +1,4 @@
 services:
-  frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
-    container_name: frontend
-    networks:
-      - app-network
-    volumes:
-      - frontend-build:/app/build
-    command: >
-      sh -c "touch /app/build/BUILD_COMPLETE"
-
   backend:
     build:
       context: .
@@ -22,17 +10,9 @@ services:
       - backend/.env
     networks:
       - app-network
-    volumes:
-      - frontend-build:/app/../frontend/build:ro
-    depends_on:
-      - frontend
+    restart: unless-stopped
     command: >
-      sh -c 'while [ ! -f /app/../frontend/build/BUILD_COMPLETE ]; do
-      echo "Waiting for frontend build..."; sleep 5; done &&
-      gunicorn --bind 0.0.0.0:5000 run:app'
-
-volumes:
-  frontend-build: {}
+      sh -c "gunicorn --bind 0.0.0.0:5000 run:app"
 
 networks:
   app-network:

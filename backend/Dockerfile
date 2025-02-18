@@ -8,6 +8,9 @@ ENV PYTHONUNBUFFERED 1
 # Set the working directory
 WORKDIR /app
 
+# Install system dependencies
+RUN apt-get update && apt-get install -y curl unzip && rm -rf /var/lib/apt/lists/*
+
 # Copy the requirements file and install dependencies
 COPY backend/requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
