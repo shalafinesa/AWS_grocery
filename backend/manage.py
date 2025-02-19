@@ -1,7 +1,7 @@
 import os
 import time
 import psycopg2
-from flask_migrate import Migrate, upgrade
+from flask_migrate import Migrate, upgrade, init
 from app import create_app, db, Config
 
 app = create_app()
@@ -10,6 +10,8 @@ migrate = Migrate(app, db)
 POSTGRES_URI = os.getenv("POSTGRES_URI")
 IS_RDS = Config.is_rds()
 IS_LOCAL = Config.is_local_postgres()
+
+MIGRATIONS_PATH = os.path.join(os.path.dirname(__file__), "migrations")
 
 
 def wait_for_db():
@@ -30,6 +32,9 @@ def run_migrations():
     """Run database migrations to ensure tables exist."""
     if IS_LOCAL:
         with app.app_context():
+            if not os.path.exists(MIGRATIONS_PATH):
+                print("No migrations found. Initializing migrations.")
+                init()
             print("Running migrations...")
             upgrade()
     else:
