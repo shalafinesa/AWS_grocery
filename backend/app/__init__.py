@@ -50,11 +50,7 @@ class Config:
     @classmethod
     def is_local_postgres(cls):
         """Check if 'postgres' resolves to a local Docker container."""
-        try:
-            ip = socket.gethostbyname(cls.POSTGRES_HOST)
-            return ip.startswith("172.")
-        except socket.gaierror:
-            return False
+        return not cls.is_rds()
 
     SQLALCHEMY_DATABASE_URI = POSTGRES_URI
     print(f"Using Database: {SQLALCHEMY_DATABASE_URI}")

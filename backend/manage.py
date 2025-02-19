@@ -1,15 +1,15 @@
 import os
 import time
 import psycopg2
-from flask_migrate import Migrate, upgrade, init
+from flask_migrate import Migrate, upgrade, init, migrate
 from app import create_app, db, Config
 
 app = create_app()
-migrate = Migrate(app, db)
+migration = Migrate(app, db)
 
 POSTGRES_URI = os.getenv("POSTGRES_URI")
 IS_RDS = Config.is_rds()
-IS_LOCAL = Config.is_local_postgres()
+IS_LOCAL = not IS_RDS
 
 MIGRATIONS_PATH = os.path.join(os.path.dirname(__file__), "migrations")
 
@@ -33,12 +33,19 @@ def run_migrations():
     if IS_LOCAL:
         with app.app_context():
             if not os.path.exists(MIGRATIONS_PATH):
-                print("No migrations found. Initializing migrations.")
+                print("⚠️ No migrations found. Initializing migrations...")
                 init()
-            print("Running migrations...")
+
+            versions_path = os.path.join(MIGRATIONS_PATH, "versions")
+            if not os.path.exists(versions_path) or not os.listdir(versions_path):
+                print("🔄 No migration files detected. Auto-generating initial migration...")
+                migrate(message="Initial migration")
+
+            print("🚀 Running database migrations...")
             upgrade()
+
     else:
-        print("Skipping migrations - Using AWS RDS")
+        print("✅ Skipping migrations - Using AWS RDS")
 
 
 def seed_database():
