@@ -36,7 +36,7 @@ def run_migrations():
 def seed_database():
     """Seed the database, ensuring products are inserted before reviews."""
     sql_file = "app/sqlite_dump_clean.sql"
-    if os.path.exists(sql_file):
+    if os.path.exists(sql_file) and IS_LOCAL:
         print("📂 Seeding database with sqlite_dump_clean.sql...")
 
         with app.app_context():
@@ -83,8 +83,8 @@ def seed_database():
 
 
 if __name__ == "__main__":
+    wait_for_db()
     if IS_LOCAL:
-        wait_for_db()
         run_migrations()
         seed_database()
     elif IS_RDS:
