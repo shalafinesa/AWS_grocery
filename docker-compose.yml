@@ -11,8 +11,36 @@ services:
     networks:
       - app-network
     restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
     command: >
-      sh -c "gunicorn --bind 0.0.0.0:5000 run:app"
+      sh -c "python manage.py db upgrade &&
+             python manage.py seed_database &&
+             gunicorn --bind 0.0.0.0:5000 run:app"
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    env_file:
+      - backend/.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  postgres_data:
 
 networks:
   app-network:

@@ -1,4 +1,4 @@
-﻿CREATE TABLE basket_items (
+CREATE TABLE basket_items (
     id SERIAL PRIMARY KEY,
     product_id INTEGER NOT NULL,
     quantity INTEGER NOT NULL,

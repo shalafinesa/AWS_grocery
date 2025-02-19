@@ -4,6 +4,7 @@ import tempfile
 import zipfile
 from logging.handlers import RotatingFileHandler
 import os
+import socket
 from flask import Flask, send_from_directory, render_template, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -29,10 +30,31 @@ GITHUB_RELEASE_URL = f"https://github.com/{GITHUB_USERNAME}/{REPO_NAME}/releases
 
 class Config:
     """App configuration variables."""
+    POSTGRES_USER = os.getenv("POSTGRES_USER", "postgres")
+    POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "postgres")
+    POSTGRES_DB = os.getenv("POSTGRES_DB", "postgres")
+    POSTGRES_HOST = os.getenv("POSTGRES_HOST", "postgres")
+    POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
+
     POSTGRES_URI = os.getenv("POSTGRES_URI")
 
     if not POSTGRES_URI:
         raise ValueError("POSTGRES_URI environment variable is not set.")
+
+    @classmethod
+    def is_rds(cls):
+        """Check if using AWS RDS by detecting an external hostname."""
+        rds_hostnames = ["rds.amazonaws.com", "amazonaws.com"]
+        return any(h in cls.POSTGRES_URI for h in rds_hostnames)
+
+    @classmethod
+    def is_local_postgres(cls):
+        """Check if 'postgres' resolves to a local Docker container."""
+        try:
+            ip = socket.gethostbyname(cls.POSTGRES_HOST)
+            return ip.startswith("172.")
+        except socket.gaierror:
+            return False
 
     SQLALCHEMY_DATABASE_URI = POSTGRES_URI
     print(f"Using Database: {SQLALCHEMY_DATABASE_URI}")
@@ -40,6 +62,18 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=4)
+
+
+def detect_environment():
+    if Config.is_rds():
+        print("Running on AWS RDS (Production)")
+    elif Config.is_local_postgres():
+        print("Running in Local Docker PostgreSQL")
+    else:
+        print("Could not detect database environment. Set POSTGRES_URI manually.")
+    print(f"Using Database: {Config.SQLALCHEMY_DATABASE_URI}")
+
+detect_environment()
 
 
 def get_public_ip():
