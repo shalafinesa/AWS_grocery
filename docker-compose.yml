@@ -18,13 +18,7 @@ services:
       - ./backend:/app
     command: >
       sh -c "
-        if [ \"$IS_RDS\" = \"true\" ]; then
-          echo '✅ Skipping migrations & seeding for AWS RDS';
-        else
-          echo '🚀 Running migrations...';
-          flask db upgrade;
-          python manage.py seed_database;
-        fi;
+        python manage.py;
         gunicorn --bind 0.0.0.0:5000 run:app
       "
 

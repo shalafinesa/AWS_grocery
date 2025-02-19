@@ -28,64 +28,65 @@ def wait_for_db():
 
 def run_migrations():
     """Run database migrations to ensure tables exist."""
-    with app.app_context():
-        print("🚀 Running migrations...")
-        upgrade()
+    if IS_LOCAL:
+        with app.app_context():
+            print("Running migrations...")
+            upgrade()
+    else:
+        print("Skipping migrations - Using AWS RDS")
 
 
 def seed_database():
     """Seed the database, ensuring products are inserted before reviews."""
-    sql_file = "app/sqlite_dump_clean.sql"
-    if os.path.exists(sql_file) and IS_LOCAL:
-        print("📂 Seeding database with sqlite_dump_clean.sql...")
+    if IS_LOCAL:
+        sql_file = "app/sqlite_dump_clean.sql"
+        if os.path.exists(sql_file) and IS_LOCAL:
+            print("📂 Seeding database with sqlite_dump_clean.sql...")
 
-        with app.app_context():
-            conn = db.engine.raw_connection()
-            cursor = conn.cursor()
+            with app.app_context():
+                conn = db.engine.raw_connection()
+                cursor = conn.cursor()
 
-            with open(sql_file, "r", encoding="utf-8") as f:
-                sql_commands = [cmd.strip() for cmd in f.read().split(";") if cmd.strip()]
+                with open(sql_file, "r", encoding="utf-8") as f:
+                    sql_commands = [cmd.strip() for cmd in f.read().split(";") if cmd.strip()]
 
-            # 🛠️ Insert products first
-            for command in sql_commands:
-                if "INSERT INTO products" in command:
-                    try:
-                        cursor.execute(command)
-                    except psycopg2.errors.UniqueViolation:
-                        print("⚠️ Skipping duplicate product entry.")
-                        conn.rollback()
-                    except psycopg2.Error as e:
-                        print(f"❌ SQL Error (Products): {e}")
-                        conn.rollback()
+                # 🛠️ Insert products first
+                for command in sql_commands:
+                    if "INSERT INTO products" in command:
+                        try:
+                            cursor.execute(command)
+                        except psycopg2.errors.UniqueViolation:
+                            print("⚠️ Skipping duplicate product entry.")
+                            conn.rollback()
+                        except psycopg2.Error as e:
+                            print(f"❌ SQL Error (Products): {e}")
+                            conn.rollback()
 
-            conn.commit()
+                conn.commit()
 
-            # 🛠️ Insert all other data (users, reviews, etc.)
-            for command in sql_commands:
-                if "INSERT INTO products" not in command:
-                    try:
-                        cursor.execute(command)
-                    except psycopg2.errors.ForeignKeyViolation:
-                        print("⚠️ Skipping review due to missing product reference.")
-                        conn.rollback()
-                    except psycopg2.errors.UniqueViolation:
-                        print("⚠️ Skipping duplicate entry.")
-                        conn.rollback()
-                    except psycopg2.Error as e:
-                        print(f"❌ SQL Error: {e}")
-                        conn.rollback()
+                # 🛠️ Insert all other data (users, reviews, etc.)
+                for command in sql_commands:
+                    if "INSERT INTO products" not in command:
+                        try:
+                            cursor.execute(command)
+                        except psycopg2.errors.ForeignKeyViolation:
+                            print("⚠️ Skipping review due to missing product reference.")
+                            conn.rollback()
+                        except psycopg2.errors.UniqueViolation:
+                            print("⚠️ Skipping duplicate entry.")
+                            conn.rollback()
+                        except psycopg2.Error as e:
+                            print(f"❌ SQL Error: {e}")
+                            conn.rollback()
 
-            conn.commit()
-            cursor.close()
-            conn.close()
+                conn.commit()
+                cursor.close()
+                conn.close()
 
-        print("✅ Database seeding complete!")
+            print("✅ Database seeding complete!")
 
 
 if __name__ == "__main__":
     wait_for_db()
-    if IS_LOCAL:
-        run_migrations()
-        seed_database()
-    elif IS_RDS:
-        print("✅ Skipping setup - Using AWS RDS (Manual Database Management).")
+    run_migrations()
+    seed_database()
