@@ -29,12 +29,13 @@ GITHUB_RELEASE_URL = f"https://github.com/{GITHUB_USERNAME}/{REPO_NAME}/releases
 
 class Config:
     """App configuration variables."""
-    if os.getenv("FLASK_ENV") == "development":
-        SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(os.path.abspath(os.path.dirname(__file__)), "local.db")
-    else:
-        POSTGRES_URI = os.getenv("POSTGRES_URI")
-        SQLALCHEMY_DATABASE_URI = POSTGRES_URI
-    print(SQLALCHEMY_DATABASE_URI)
+    POSTGRES_URI = os.getenv("POSTGRES_URI")
+
+    if not POSTGRES_URI:
+        raise ValueError("POSTGRES_URI environment variable is not set.")
+
+    SQLALCHEMY_DATABASE_URI = POSTGRES_URI
+    print(f"Using Database: {SQLALCHEMY_DATABASE_URI}")
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
