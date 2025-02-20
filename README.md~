@@ -207,7 +207,7 @@ Edit the .env file
 ## 5️⃣ Populate the Database with Initial Data
 After running migrations, we populate the database with test data(Make sure to use the correct user, DB and password).
 
-    psql -U grocery_user -d grocerymate_db -f app/sqlite_dump_clean.sql
+    psql -U grocery_user -d grocerymate_db -f backend/app/sqlite_dump_clean.sql
 
 Verify that data has been inserted:
 
