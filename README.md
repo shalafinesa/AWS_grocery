@@ -221,8 +221,7 @@ You can exit the PostgreSQL CLI by typing `\q`
 
 
 ### Start the Application:
-    
-        cd ../backend
+
         python3 run.py
 
 ### Navigate and get familiar with the app
