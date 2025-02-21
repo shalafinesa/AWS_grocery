@@ -68,10 +68,10 @@ def seed_database():
                         try:
                             cursor.execute(command)
                         except psycopg2.errors.UniqueViolation:
-                            print("⚠️ Skipping duplicate product entry.")
+                            # Suppress duplicate product entry messages
                             conn.rollback()
                         except psycopg2.Error as e:
-                            print(f"❌ SQL Error (Products): {e}")
+                            print(f"❌ Critical SQL Error (Products): {e}")
                             conn.rollback()
 
                 conn.commit()
@@ -82,13 +82,13 @@ def seed_database():
                         try:
                             cursor.execute(command)
                         except psycopg2.errors.ForeignKeyViolation:
-                            print("⚠️ Skipping review due to missing product reference.")
                             conn.rollback()
                         except psycopg2.errors.UniqueViolation:
-                            print("⚠️ Skipping duplicate entry.")
+                            conn.rollback()
+                        except psycopg2.errors.DuplicateTable:
                             conn.rollback()
                         except psycopg2.Error as e:
-                            print(f"❌ SQL Error: {e}")
+                            print(f"❌ Critical SQL Error: {e}")
                             conn.rollback()
 
                 conn.commit()
