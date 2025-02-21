@@ -51,6 +51,10 @@ Follow these steps to set up the application locally.
 Clone the repository:
 
     git clone --branch version2 https://github.com/AlejandroRomanIbanez/AWS_grocery.git
+
+Go inside the repository:
+
+    cd AWS_grocery
     
 
 ## 2️⃣ Install pyenv and python (if you haven't yet)
