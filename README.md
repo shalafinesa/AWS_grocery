@@ -14,8 +14,6 @@
 
 ## 📌 Table of Contents
 
-## 📌 Table of Contents
-
 - [Overview](#🚀-overview)
 - [Features](#🛒-features)
 - [Screenshots & Demo](#📸-screenshots--demo)
@@ -83,7 +81,7 @@ Create database and user:
 ```sh
 psql -U postgres -c "CREATE DATABASE grocerymate_db;"
 psql -U postgres -c "CREATE USER grocery_user WITH ENCRYPTED PASSWORD '<your_secure_password>';"  # Replace <your_secure_password> with a strong password of your choice
-psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE grocerymate_db TO grocery_user;"
+psql -U postgres -c "ALTER USER grocery_user WITH SUPERUSER;"
 ```
 
 ### 🔹 Populate Database
@@ -105,7 +103,6 @@ Install dependencies:
 
 ```sh
 cd backend
-pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
@@ -123,7 +120,7 @@ ni .env -Force  # Windows
 Generate a secure JWT key:
 
 ```sh
-python -c "import secrets; print(secrets.token_hex(32))"
+python3 -c "import secrets; print(secrets.token_hex(32))"
 ```
 
 Update `.env` with:
@@ -140,7 +137,7 @@ POSTGRES_URI=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}
 ### 🔹 Start the Application
 
 ```sh
-python run.py
+python3 run.py
 ```
 
 ## 📖 Usage
