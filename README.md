@@ -2,13 +2,13 @@
 
 ## 🏆 GroceryMate E-Commerce Platform
 
-**Language:** Python, JavaScript | **OS:** Linux, Windows, macOS | **Database:** PostgreSQL | **Security:** A-rated | **Reliability:** A | **Maintainability:** A | **GitHub Release:** v1.3.1 | **Release Date:** December 2024 | **Last Commit:** December 2024 | **ChatGPT:** Available | **Getting Started:** Guide | **Free for Non-Commercial Use**
+[![Python](https://img.shields.io/badge/Language-Python%2C%20JavaScript-blue)](https://www.python.org/)
+[![OS](https://img.shields.io/badge/OS-Linux%2C%20Windows%2C%20macOS-green)](https://www.kernel.org/)
+[![Database](https://img.shields.io/badge/Database-PostgreSQL-336791)](https://www.postgresql.org/)
+[![GitHub Release](https://img.shields.io/github/v/release/AlejandroRomanIbanez/AWS_grocery)](https://github.com/AlejandroRomanIbanez/AWS_grocery/releases/tag/v2.0.0)
+[![Free](https://img.shields.io/badge/Free_for_Non_Commercial_Use-brightgreen)](#-license)
 
 ⭐ **Star us on GitHub** — it motivates us a lot!
-
-[Share](#) [Share](#) [Share](#) [Share](#) [Share](#)
-
-🔥 **Why GroceryMate is the best choice for online grocery shopping?** — Find out in our [presentation](#) 📑
 
 ---
 
