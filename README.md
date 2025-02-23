@@ -49,7 +49,12 @@ GroceryMate is a modern, full-featured e-commerce platform designed for seamless
 
 ## 📸 Screenshots & Demo
 
-(Include relevant images and demo videos)
+![imagen](https://github.com/user-attachments/assets/ea039195-67a2-4bf2-9613-2ee1e666231a)
+![imagen](https://github.com/user-attachments/assets/a87e5c50-5a9e-45b8-ad16-2dbff41acd00)
+![imagen](https://github.com/user-attachments/assets/589aae62-67ef-4496-bd3b-772cd32ca386)
+![imagen](https://github.com/user-attachments/assets/2772b85e-81f7-446a-9296-4fdc2b652cb7)
+
+https://github.com/user-attachments/assets/d1c5c8e4-5b16-486a-b709-4cf6e6cce6bc
 
 ## 📋 Prerequisites
 
