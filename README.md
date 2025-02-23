@@ -14,20 +14,22 @@
 
 ## 📌 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Screenshots & Demo](#screenshots--demo)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-  - [Clone Repository](#clone-repository)
-  - [Configure PostgreSQL](#configure-postgresql)
-  - [Populate Database](#populate-database)
-  - [Set Up Python Environment](#set-up-python-environment)
-  - [Set Environment Variables](#set-environment-variables)
-  - [Start the Application](#start-the-application)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+## 📌 Table of Contents
+
+- [Overview](#🚀-overview)
+- [Features](#🛒-features)
+- [Screenshots & Demo](#📸-screenshots--demo)
+- [Prerequisites](#📋-prerequisites)
+- [Installation](#⚙️-installation)
+  - [Clone Repository](#🔹-clone-repository)
+  - [Configure PostgreSQL](#🔹-configure-postgresql)
+  - [Populate Database](#🔹-populate-database)
+  - [Set Up Python Environment](#🔹-set-up-python-environment)
+  - [Set Environment Variables](#🔹-set-environment-variables)
+  - [Start the Application](#🔹-start-the-application)
+- [Usage](#📖-usage)
+- [Contributing](#🤝-contributing)
+- [License](#📜-license)
 
 ## 🚀 Overview
 
@@ -161,4 +163,7 @@ We welcome contributions! Please follow these steps:
 ## 📜 License
 
 This project is licensed under the MIT License.
+
+
+
 
