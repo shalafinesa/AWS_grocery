@@ -100,7 +100,7 @@ psql -U grocery_user -d grocerymate_db -c "SELECT * FROM products;"
 ### 🔹 Set Up Python Environment
 
 
-Install dependencies in a activated virtual Enviroment:
+Install dependencies in an activated virtual Enviroment:
 
 ```sh
 cd backend
