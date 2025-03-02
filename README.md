@@ -87,7 +87,7 @@ psql -U postgres -c "ALTER USER grocery_user WITH SUPERUSER;"
 ### 🔹 Populate Database
 
 ```sh
-psql -U grocery_user -d grocerymate_db -f app/sqlite_dump_clean.sql
+psql -U grocery_user -d grocerymate_db -f backend/app/sqlite_dump_clean.sql
 ```
 
 Verify insertion:
