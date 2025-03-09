@@ -106,8 +106,10 @@ Install dependencies in an activated virtual Enviroment:
 cd backend
 pip install -r requirements.txt
 ```
-
-
+OR (if pip doesn't exist)
+```sh
+pip3 install -r requirements.txt
+```
 
 ### 🔹 Set Environment Variables
 
