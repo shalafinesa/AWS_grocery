@@ -126,7 +126,13 @@ Generate a secure JWT key:
 python3 -c "import secrets; print(secrets.token_hex(32))"
 ```
 
-Update `.env` with:
+Update `.env`:
+
+```sh
+nano .env
+```
+
+Fill in with the following data (make sure to replace the placeholders):
 
 ```ini
 JWT_SECRET_KEY=<your_generated_key>
