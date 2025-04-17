@@ -132,7 +132,7 @@ Update `.env`:
 nano .env
 ```
 
-Fill in with the following data (make sure to replace the <placeholders>):
+Fill in with the following data (make sure to replace the placeholders):
 
 ```ini
 JWT_SECRET_KEY=<your_generated_key>
