@@ -37,18 +37,18 @@ It demonstrates:
 
 ---
 
-## 🏢 Architecture
+🏢 Architecture
 
-![GroceryMate AWS Architecture](./docs/grocerymate-architecture.png)
+![AWS Architecture](docs/architecture.png)
 
 **Key Highlights:**
-- **VPC:** Custom VPC with public/private subnets in 2 AZs  
-- **EC2:** Two Dockerized application servers, managed via Auto Scaling Group  
-- **ALB:** Distributes incoming traffic to healthy EC2 instances  
-- **RDS:** PostgreSQL database in private subnet  
-- **S3:** Private bucket for user avatars and static assets  
-- **Bastion Host:** Secure SSH access to private EC2 instances  
-- **IAM:** Fine-grained access policies for EC2, S3, and other resources
+- VPC: Custom VPC with public/private subnets in 2 AZs
+- EC2: Two Dockerized application servers, managed via Auto Scaling Group
+- ALB: Distributes incoming traffic to healthy EC2 instances
+- RDS: PostgreSQL database in private subnet
+- S3: Private bucket for user avatars and static assets
+- Bastion Host: Secure SSH access to private EC2 instances
+- IAM: Fine-grained access policies for EC2, S3, and other resources
 
 ---
 
