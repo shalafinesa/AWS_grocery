@@ -105,8 +105,8 @@ Connect via Bastion (if needed)
 
 bash
 Copy code
-ssh -i /path/to/your-key.pem ec2-user@<BASTION_PUBLIC_IP>
-ssh -A ec2-user@<PRIVATE_EC2_IP>
+ssh -i /path/to/yawsgrocery.pem ec2-user@<BASTION_PUBLIC_IP>
+ssh -A ec2-user@<ip-172-31-19-85.eu-north-1.compute.internal>
 Set up backend & Docker
 
 bash
@@ -130,7 +130,7 @@ Access the application
 
 text
 Copy code
-http://<ALB_DNS>:5000
+http://<[ALB_DNS](http://grocerymate-alb-1585060182.eu-north-1.elb.amazonaws.com/)>:5000
 🔑 Environment Variables
 JWT_SECRET_KEY – secure JWT token for authentication
 
