@@ -1,0 +1,32 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Environment variables
+.env
+
+# IDE/project files
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Mac system files
+.DS_Store
+
+# Node modules / frontend builds
+node_modules/
+frontend/frontend-build.zip
+frontend/temp_extract/
+
+# Editor backup files
+*~
+
+# Python virtual environment
+venv/
+.idea/aws.xml
+frontend/frontend-build.zip
+frontend/temp_extract/
+frontend/src/config.js~
+venv/
