@@ -32,3 +32,4 @@ frontend/src/config.js~
 venv/
 .terraform/
 .terraform/
+.terraform/
