@@ -1,3 +1,15 @@
+# Terraform local directories and files
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform.lock.hcl
+
 # Python cache files
 __pycache__/
 *.py[cod]
@@ -14,22 +26,14 @@ __pycache__/
 
 # Mac system files
 .DS_Store
+Thumbs.db
 
 # Node modules / frontend builds
 node_modules/
-frontend/frontend-build.zip
-frontend/temp_extract/
 
-# Editor backup files
-*~
+# Docker
+docker-compose.override.yml
 
-# Python virtual environment
-venv/
-.idea/aws.xml
-frontend/frontend-build.zip
-frontend/temp_extract/
-frontend/src/config.js~
-venv/
-.terraform/
-.terraform/
-.terraform/
+# Backup folders
+AWS_grocery_backup/
+
