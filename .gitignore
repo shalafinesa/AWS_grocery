@@ -31,3 +31,4 @@ frontend/temp_extract/
 frontend/src/config.js~
 venv/
 .terraform/
+.terraform/
