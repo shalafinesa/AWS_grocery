@@ -32,8 +32,7 @@ The project showcases:
 
 ## 🏢 Architecture Overview
 
-![AWS GroceryMate Architecture](./architecture-diagram.png)  
-*Include your architecture diagram image in the repository at `architecture-diagram.png`*
+![AWS GroceryMate Architecture](./docs/architecture.png)
 
 Components:
 - **VPC**: Default setup for local testing / optional AWS deployment
