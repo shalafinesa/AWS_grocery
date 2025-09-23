@@ -1,129 +1,118 @@
-# 🛒 AWS GroceryMate – Cloud Infrastructure & Deployment
+# 🛒 AWS GroceryMate – Backend & Cloud Setup
 
 **Author:** Finesa Shala  
 **GitHub:** [https://github.com/shalafinesa/AWS_grocery](https://github.com/shalafinesa/AWS_grocery)  
-**Date:** September 23, 2025  
+**Date:** September 23, 2025
 
 ---
 
 ## 📋 Table of Contents
 1. [Project Overview](#project-overview)  
 2. [Architecture Overview](#architecture-overview)  
-3. [Terraform Modules](#terraform-modules)  
-4. [AWS Infrastructure Components](#aws-infrastructure-components)  
-5. [Deployment & Setup](#deployment--setup)  
-6. [Environment Variables](#environment-variables)  
-7. [Future Enhancements](#future-enhancements)  
-8. [License](#license)  
+3. [AWS Infrastructure Components](#aws-infrastructure-components)  
+4. [Deployment & Setup](#deployment--setup)  
+5. [Environment Variables](#environment-variables)  
+6. [Future Enhancements](#future-enhancements)  
+7. [License](#license)  
 
 ---
 
 ## 🔹 Project Overview
-The AWS GroceryMate project is a hands-on learning exercise for the **Masterschool Software Engineering Cloud Track**.  
-It demonstrates how to deploy a full-stack application using **AWS services** and **Terraform**, focusing on:
+AWS GroceryMate is a hands-on project demonstrating a backend application for an online grocery store.  
 
-- Modular infrastructure design  
-- Scalable and highly available architecture  
-- Automated deployment of backend services with Docker  
-- Secure database and storage management  
-- Best practices for cloud resource organization and access control  
+The project showcases:
+- Backend REST API development with Python
+- Dockerized services for local deployment
+- Integration with AWS services for storage and database
+- Basic understanding of cloud deployment and infrastructure
+
+> This version reflects my own work, focused on backend services, storage integration, and Docker deployment.
 
 ---
 
 ## 🏢 Architecture Overview
-- **VPC:** Custom public/private subnets across 2 AZs  
-- **EC2:** Dockerized application servers managed with Auto Scaling Groups  
-- **ALB:** Routes traffic to healthy EC2 instances  
-- **RDS:** PostgreSQL database in private subnet  
-- **S3 Bucket:** Private storage for static assets  
-- **Bastion Host:** Secure SSH access to private resources  
-- **IAM Roles:** Least privilege access policies  
 
----
+![AWS GroceryMate Architecture](./architecture.png)  
 
-## 🔩 Terraform Modules
-| Module            | Purpose |
-|------------------|---------|
-| `vpc`            | Custom VPC with routing, internet gateway, public/private subnets |
-| `app_instance`   | EC2 instances configured with Docker for backend services |
-| `alb`            | Load balancing for high availability |
-| `rds`            | PostgreSQL database deployment in private subnet |
-| `bastion`        | Jump host for secure access to private instances |
-| `security_groups`| Network traffic rules between EC2, RDS, ALB, and other components |
-| `s3_bucket`      | Private S3 bucket for static files and default avatars |
-| `iam`            | IAM roles and policies for EC2 and S3 access |
+Components:
+- **VPC**: Default setup for local testing / optional AWS deployment
+- **EC2**: Dockerized backend server (manual setup, no auto-scaling)
+- **ALB**: Routes traffic to EC2 instance (optional for AWS deployment)
+- **RDS**: PostgreSQL database
+- **S3 Bucket**: Storage for static assets and user avatars  
+
+> Note: Auto Scaling Groups and Terraform modules were removed because they were not part of my implementation. The architecture reflects the actual local setup.
 
 ---
 
 ## ⚙️ AWS Infrastructure Components
-1. **EC2:** Dockerized backend, Auto Scaling  
-2. **ALB:** Distributes traffic to healthy instances  
-3. **RDS:** Private PostgreSQL database  
-4. **S3:** Storage for static assets  
-5. **Bastion Host:** Secure SSH to private instances  
-6. **IAM:** Least privilege roles  
+| Component | Purpose |
+|-----------|---------|
+| **EC2** | Runs the backend application inside a Docker container |
+| **ALB** | Optional load balancer for routing traffic to the instance |
+| **RDS** | PostgreSQL database storing products, users, and orders |
+| **S3** | Storage for static assets (product images, avatars) |
+| **IAM** | Access roles for EC2 and S3 |
 
 ---
 
-🚀 Deployment & Setup
-Step 1: Clone Repository
+## 🚀 Deployment & Setup
+
+### Step 1: Clone Repository
+```bash
 git clone https://github.com/shalafinesa/AWS_grocery.git
-cd AWS_grocery
+cd AWS_grocery/backend
 
-Step 2: Configure Terraform
-# terraform.tfvars
-key_name       = "awsgrocery"
-app_repo_url   = "https://github.com/shalafinesa/AWS_grocery.git"
-db_name        = "grocerymate_db"
-db_user        = "grocery_user"
-db_password    = "YourStrongPassword123"
-jwt_secret_key = "your-generated-jwt-key"
-my_ip          = "YOUR_IP/32"
-
-Step 3: Apply Infrastructure
-cd infrastructure
-terraform init
-terraform plan
-terraform apply
-
-Step 4: Connect via Bastion (optional)
-ssh -i /path/to/your-key.pem ec2-user@<BASTION_PUBLIC_IP>
-ssh -A ec2-user@<PRIVATE_EC2_IP>
-
-Step 5: Setup Backend & Docker
-cd backend
+### Step 2: Install Dependencies
+```bash
 pip install -r requirements.txt
 
+### Step 3: Run Backend (Docker optional)
+## Without Docker:
+```bash
+python run.py
+
+## With Docker:
+```bash
 docker run --network host \
-  -e S3_BUCKET_NAME=<your-s3-bucket> \
-  -e S3_REGION=<your-region> \
-  -e USE_S3_STORAGE=true \
+  -e S3_BUCKET_NAME=your_bucket_name \
   -e POSTGRES_USER=grocery_user \
-  -e POSTGRES_PASSWORD=<YourStrongPassword123> \
+  -e POSTGRES_PASSWORD=your_db_password \
   -e POSTGRES_DB=grocerymate_db \
   -e POSTGRES_HOST=<RDS_ENDPOINT> \
-  -e POSTGRES_URI=postgresql://grocery_user:<YourStrongPassword123>@<RDS_ENDPOINT>:5432/grocerymate_db \
-  -e JWT_SECRET_KEY=<your-jwt-key> \
+  -e JWT_SECRET_KEY=your_jwt_secret \
   -p 5000:5000 grocerymate
 
-Step 6: Access Application
-http://<ALB_DNS>:5000
+### Step 4: Access Application
 
-🔑 Environment Variables
-JWT_SECRET_KEY       # JWT token for authentication
-POSTGRES_USER        # Database username
-POSTGRES_PASSWORD    # Database password
-POSTGRES_DB          # Database name
-POSTGRES_HOST        # RDS endpoint
-S3_BUCKET_NAME       # S3 bucket for static assets
-S3_REGION            # S3 bucket region
+- **Backend API endpoints:**  
+  - `http://localhost:5000`
 
-💡 Future Enhancements
-# Event-driven invoice creation with AWS Lambda + EventBridge
-# Launch Templates for Auto Scaling instead of manual AMI creation
-# CloudWatch monitoring & alerts
-# Separate dev/prod environments with modular Terraform
+- **Example routes:**  
+  - `/api/products/` – Get all products  
+  - `/api/products/{id}/` – Get product by ID  
+  - `/api/auth/login` – User login  
+  - `/api/orders/` – Manage orders
 
-📄 License
+### 🔑 Environment Variables
 
-MIT License
+| Variable           | Purpose                                  |
+|-------------------|------------------------------------------|
+| JWT_SECRET_KEY     | Secret key for JWT authentication       |
+| POSTGRES_USER      | Database username                        |
+| POSTGRES_PASSWORD  | Database password                        |
+| POSTGRES_DB        | Database name                            |
+| POSTGRES_HOST      | RDS or local database host               |
+| S3_BUCKET_NAME     | Bucket name for static files             |
+| S3_REGION          | Bucket region                             |
+
+
+### 💡 Future Enhancements
+
+- Connect backend to more AWS services (Lambda, EventBridge)  
+- Add automated deployment scripts  
+- Improve API security and monitoring
+
+### 📜 License
+
+This project is licensed under the **MIT License** and is free for non-commercial use.
