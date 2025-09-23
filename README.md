@@ -22,11 +22,11 @@
 The AWS GroceryMate project is a hands-on learning exercise for the **Masterschool Software Engineering Cloud Track**.  
 It demonstrates how to deploy a full-stack application using **AWS services** and **Terraform**, focusing on:
 
-- 🔹 Modular infrastructure design  
-- ⚡ Scalable and highly available architecture  
-- 🐳 Automated deployment of backend services with Docker  
-- 🔒 Secure database and storage management  
-- 🛠️ Best practices for cloud resource organization and access control  
+- Modular infrastructure design  
+- Scalable and highly available architecture  
+- Automated deployment of backend services with Docker  
+- Secure database and storage management  
+- Best practices for cloud resource organization and access control  
 
 ---
 
@@ -67,22 +67,16 @@ It demonstrates how to deploy a full-stack application using **AWS services** an
 
 ## 🚀 Deployment & Setup
 
-### Prerequisites
-- AWS Account with IAM credentials  
-- Terraform v1.x  
-- Python 3.11+  
-- PostgreSQL (or RDS)  
-- Docker  
-
 ### Step 1: Clone Repository
 ```bash
 git clone https://github.com/shalafinesa/AWS_grocery.git
 cd AWS_grocery
-Step 2: Configure Terraform
-Create terraform.tfvars:
 
-hcl
-Copy code
+### Step 2: Configure Terraform
+
+Create `terraform.tfvars`:
+
+```hcl
 key_name       = "awsgrocery"
 app_repo_url   = "https://github.com/shalafinesa/AWS_grocery.git"
 db_name        = "grocerymate_db"
@@ -90,21 +84,24 @@ db_user        = "grocery_user"
 db_password    = "YourStrongPassword123"
 jwt_secret_key = "your-generated-jwt-key"
 my_ip          = "YOUR_IP/32"
-Step 3: Apply Infrastructure
-bash
-Copy code
+
+### Step 3: Apply Infrastructure
+
+```bash
 cd infrastructure
 terraform init
 terraform plan
 terraform apply
-Step 4: Connect via Bastion (optional)
-bash
-Copy code
+
+### Step 4: Connect via Bastion (optional)
+
+```bash
 ssh -i /path/to/your-key.pem ec2-user@<BASTION_PUBLIC_IP>
 ssh -A ec2-user@<PRIVATE_EC2_IP>
-Step 5: Setup Backend & Docker
-bash
-Copy code
+
+### Step 5: Setup Backend & Docker
+
+```bash
 cd backend
 pip install -r requirements.txt
 
@@ -119,25 +116,31 @@ docker run --network host \
   -e POSTGRES_URI=postgresql://grocery_user:<YourStrongPassword123>@<RDS_ENDPOINT>:5432/grocerymate_db \
   -e JWT_SECRET_KEY=<your-jwt-key> \
   -p 5000:5000 grocerymate
-Step 6: Access Application
-text
-Copy code
+
+### Step 6: Access Application
+
+```bash
+# Open your browser or use curl to access the application
 http://<ALB_DNS>:5000
+
 🔑 Environment Variables
-JWT_SECRET_KEY – JWT token for authentication
 
-POSTGRES_* – PostgreSQL database connection info
+JWT_SECRET_KEY – JWT for authentication
 
-S3_BUCKET_NAME & S3_REGION – S3 storage for static assets
+POSTGRES_* – database connection
+
+S3_BUCKET_NAME & S3_REGION – static storage
 
 💡 Future Enhancements
-⚡ Event-driven invoice creation with AWS Lambda + EventBridge
 
-🐳 Launch Templates for Auto Scaling instead of manual AMI creation
+Event-driven invoice creation with AWS Lambda + EventBridge
 
-📊 CloudWatch monitoring & alerts
+Launch Templates for Auto Scaling instead of manual AMI creation
 
-🔹 Separate dev/prod environments
+CloudWatch monitoring & alerts
+
+Separate dev/prod environments
 
 📄 License
+
 MIT License
