@@ -32,7 +32,8 @@ The project showcases:
 
 ## 🏢 Architecture Overview
 
-![AWS GroceryMate Architecture]([./architecture.png](https://github.com/shalafinesa/AWS_grocery/blob/main/docs/architecture.png))  
+![AWS GroceryMate Architecture](./architecture-diagram.png)  
+*Include your architecture diagram image in the repository at `architecture-diagram.png`*
 
 Components:
 - **VPC**: Default setup for local testing / optional AWS deployment
@@ -62,15 +63,18 @@ Components:
 ```bash
 git clone https://github.com/shalafinesa/AWS_grocery.git
 cd AWS_grocery/backend
+```
 
 ### Step 2: Install Dependencies
 ```bash
 pip install -r requirements.txt
+```
 
 ### Step 3: Run Backend (Docker optional)
 ## Without Docker:
 ```bash
 python run.py
+```
 
 ## With Docker:
 ```bash
@@ -82,6 +86,7 @@ docker run --network host \
   -e POSTGRES_HOST=<RDS_ENDPOINT> \
   -e JWT_SECRET_KEY=your_jwt_secret \
   -p 5000:5000 grocerymate
+```
 
 ### Step 4: Access Application
 
