@@ -32,7 +32,7 @@ The project showcases:
 
 ## 🏢 Architecture Overview
 
-![AWS GroceryMate Architecture](./architecture.png)  
+![AWS GroceryMate Architecture]([./architecture.png](https://github.com/shalafinesa/AWS_grocery/blob/main/docs/architecture.png))  
 
 Components:
 - **VPC**: Default setup for local testing / optional AWS deployment
