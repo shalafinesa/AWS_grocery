@@ -65,18 +65,13 @@ It demonstrates how to deploy a full-stack application using **AWS services** an
 
 ---
 
-## 🚀 Deployment & Setup
-
-### Step 1: Clone Repository
-```bash
+🚀 Deployment & Setup
+Step 1: Clone Repository
 git clone https://github.com/shalafinesa/AWS_grocery.git
 cd AWS_grocery
 
-### Step 2: Configure Terraform
-
-Create `terraform.tfvars`:
-
-```hcl
+Step 2: Configure Terraform
+# terraform.tfvars
 key_name       = "awsgrocery"
 app_repo_url   = "https://github.com/shalafinesa/AWS_grocery.git"
 db_name        = "grocerymate_db"
@@ -85,23 +80,17 @@ db_password    = "YourStrongPassword123"
 jwt_secret_key = "your-generated-jwt-key"
 my_ip          = "YOUR_IP/32"
 
-### Step 3: Apply Infrastructure
-
-```bash
+Step 3: Apply Infrastructure
 cd infrastructure
 terraform init
 terraform plan
 terraform apply
 
-### Step 4: Connect via Bastion (optional)
-
-```bash
+Step 4: Connect via Bastion (optional)
 ssh -i /path/to/your-key.pem ec2-user@<BASTION_PUBLIC_IP>
 ssh -A ec2-user@<PRIVATE_EC2_IP>
 
-### Step 5: Setup Backend & Docker
-
-```bash
+Step 5: Setup Backend & Docker
 cd backend
 pip install -r requirements.txt
 
@@ -117,29 +106,23 @@ docker run --network host \
   -e JWT_SECRET_KEY=<your-jwt-key> \
   -p 5000:5000 grocerymate
 
-### Step 6: Access Application
-
-```bash
-# Open your browser or use curl to access the application
+Step 6: Access Application
 http://<ALB_DNS>:5000
 
 🔑 Environment Variables
-
-JWT_SECRET_KEY – JWT for authentication
-
-POSTGRES_* – database connection
-
-S3_BUCKET_NAME & S3_REGION – static storage
+JWT_SECRET_KEY       # JWT token for authentication
+POSTGRES_USER        # Database username
+POSTGRES_PASSWORD    # Database password
+POSTGRES_DB          # Database name
+POSTGRES_HOST        # RDS endpoint
+S3_BUCKET_NAME       # S3 bucket for static assets
+S3_REGION            # S3 bucket region
 
 💡 Future Enhancements
-
-Event-driven invoice creation with AWS Lambda + EventBridge
-
-Launch Templates for Auto Scaling instead of manual AMI creation
-
-CloudWatch monitoring & alerts
-
-Separate dev/prod environments
+# Event-driven invoice creation with AWS Lambda + EventBridge
+# Launch Templates for Auto Scaling instead of manual AMI creation
+# CloudWatch monitoring & alerts
+# Separate dev/prod environments with modular Terraform
 
 📄 License
 
