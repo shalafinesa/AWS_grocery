@@ -7,5 +7,9 @@ resource "aws_instance" "grocery_ec2" {
   key_name                    = var.key_name
   iam_instance_profile        = var.iam_instance_profile
 
+
+  # Load the user_data script
+  user_data = file("${path.module}/../../scripts/user_data.sh")
+
   tags = { Name = var.instance_name }
 }
