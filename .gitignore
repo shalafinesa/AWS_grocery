@@ -2,13 +2,16 @@
 .terraform/
 *.tfstate
 *.tfstate.backup
-*.tfvars
 crash.log
 override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
 .terraform.lock.hcl
+# Terraform variable files with secrets
+*.tfvars
+*.tfvars.json
+
 
 # Python cache files
 __pycache__/
@@ -36,4 +39,5 @@ docker-compose.override.yml
 
 # Backup folders
 AWS_grocery_backup/
+
 
