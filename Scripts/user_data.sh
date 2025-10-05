@@ -17,7 +17,7 @@ cd /home/ec2-user
 yum install git -y
 
 # Clone your app repo 
-git clone https://github.com/your-username/your-repo.git app
+git clone ${app_repo_url} app
 
 cd app
 
