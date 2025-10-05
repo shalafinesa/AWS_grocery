@@ -1,8 +1,3 @@
-provider "aws" {
-  region  = "eu-north-1"
-  profile = "my-sso-profile"
-}
-
 # ------------------
 # VPC
 # ------------------
@@ -26,6 +21,7 @@ resource "aws_subnet" "public" {
 
   tags = {
     Name = "public-subnet-${count.index + 1}"
+    Tier = "Public"
   }
 }
 
@@ -40,6 +36,7 @@ resource "aws_subnet" "private" {
 
   tags = {
     Name = "private-subnet-${count.index + 1}"
+    Tier = "Private"
   }
 }
 
@@ -51,6 +48,24 @@ resource "aws_internet_gateway" "igw" {
 
   tags = {
     Name = "grocery_igw"
+  }
+}
+
+# ------------------
+# Elastic IP for NAT
+# ------------------
+resource "aws_eip" "nat" {
+  domain = "vpc"
+}
+# ------------------
+# NAT Gateway
+# ------------------
+resource "aws_nat_gateway" "main" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public[0].id
+
+  tags = {
+    Name = "nat-gateway"
   }
 }
 
@@ -78,13 +93,20 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-# Private route table (no NAT, just isolated private subnets)
+# Private route table
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
 
   tags = {
     Name = "private-rt"
   }
+}
+
+# Add route to NAT Gateway for outbound internet
+resource "aws_route" "private_nat" {
+  route_table_id         = aws_route_table.private.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.main.id
 }
 
 resource "aws_route_table_association" "private" {

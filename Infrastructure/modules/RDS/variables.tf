@@ -55,3 +55,17 @@ variable "private_subnet_ids" {
   description = "List of private subnet IDs for the DB subnet group"
   type        = list(string)
 }
+
+
+variable "ec2_sg_id" {
+  description = "Security group ID of EC2 instances"
+  type        = string
+}
+
+
+variable "vpc_id" {
+  description = "VPC ID where the RDS is deployed"
+  type        = string
+}
+
+
